@@ -34,6 +34,13 @@
           <button type="submit">Adicionar</button>
         </form>
 
+        <section aria-label="Estatísticas das tarefas" aria-live="polite">
+          <p>Total de tarefas: <span id="total-tasks">0</span></p>
+          <p>Tarefas pendentes: <span id="pending-tasks">0</span></p>
+          <p>Tarefas concluídas: <span id="completed-tasks">0</span></p>
+          <p>Percentual de conclusão: <span id="completion-percentage">0%</span></p>
+        </section>
+
         <ul id="todo-list" class="todo-list" aria-live="polite"></ul>
 
         <footer class="workbench__footer">

@@ -58,6 +58,12 @@ Abra `http://localhost:4173`. Para executar o quality gate local:
 npm run check
 ```
 
+Para executar os testes unitários das regras de negócio:
+
+```bash
+npm test
+```
+
 O mesmo gate (`lint` + `build`) roda no GitHub Actions em cada `push` e pull request — é o workflow **Quality Gate 0**, em `.github/workflows/quality-gate.yml`.
 
 ## Papéis da fábrica
@@ -101,6 +107,7 @@ Autor do PR, Code Reviewer e Release/DevOps Manager precisam ser pessoas diferen
 │   ├── app.js            # apresentação / DOM
 │   ├── store.js          # regra de negócio — candidata natural a teste unitário
 │   └── styles.css
+├── tests/                 # testes unitários das regras de negócio
 ├── scripts/               # dev, lint e build — sem dependências externas
 ├── docs/
 │   ├── prompts/           # diálogo com a fábrica, rodada a rodada (ISSUE-NN.md)
