@@ -1,11 +1,9 @@
-# ISSUE-00 — Modelo de registro de diálogo com IA
-
-Copie este arquivo para `ISSUE-NN.md`, substituindo `NN` pelo número real da Issue. Registre o que foi efetivamente enviado e recebido; não preencha com exemplos fictícios.
+# ISSUE-07 — Marcar todas as tarefas como concluídas
 
 ## Identificação da rodada
 
-- Issue: #NN —
-- Branch (ramificação):
+- Issue: #07 — Marcar todas as tarefas como concluídas
+- Branch (ramificação): feature/issue-07-
 - Autor da alteração:
 - Revisor previsto:
 - Data:
