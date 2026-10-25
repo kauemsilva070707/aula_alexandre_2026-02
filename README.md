@@ -30,9 +30,9 @@ Cada Issue, Pull Request, revisão e decisão de merge deste repositório é tam
 
 Um gerenciador de tarefas no estilo TodoMVC, em JavaScript puro, sem dependências externas. Ele chega até vocês **incompleto e sem teste automatizado nenhum** — porque é assim que software chega na vida real.
 
-**Funciona hoje:** adicionar, listar, editar, concluir, remover e persistir tarefas no navegador (`localStorage`).
+**Funciona hoje:** adicionar tarefas com prioridade e prazo máximo de conclusão, listar, editar, concluir individualmente ou em lote, remover tarefas concluídas em lote, buscar por nome, filtrar por status, ordenar por prioridade ou pelo prazo mais próximo e persistir tarefas no navegador (`localStorage`).
 
-**Ainda não existe:** contador de tarefas restantes, filtros, seleção e limpeza em massa, acessibilidade aprofundada, tratamento de erro e testes automatizados — cada um desses vira uma rodada da disciplina.
+**Ainda não existe:** seleção em massa, acessibilidade aprofundada e tratamento de erro — cada um desses vira uma rodada da disciplina.
 
 ## Como a equipe começa
 
@@ -56,6 +56,12 @@ Abra `http://localhost:4173`. Para executar o quality gate local:
 
 ```bash
 npm run check
+```
+
+Para executar os testes unitários das regras de negócio:
+
+```bash
+npm test
 ```
 
 O mesmo gate (`lint` + `build`) roda no GitHub Actions em cada `push` e pull request — é o workflow **Quality Gate 0**, em `.github/workflows/quality-gate.yml`.
@@ -101,6 +107,7 @@ Autor do PR, Code Reviewer e Release/DevOps Manager precisam ser pessoas diferen
 │   ├── app.js            # apresentação / DOM
 │   ├── store.js          # regra de negócio — candidata natural a teste unitário
 │   └── styles.css
+├── tests/                 # testes unitários das regras de negócio
 ├── scripts/               # dev, lint e build — sem dependências externas
 ├── docs/
 │   ├── prompts/           # diálogo com a fábrica, rodada a rodada (ISSUE-NN.md)
