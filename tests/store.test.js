@@ -3,6 +3,7 @@ import test from 'node:test';
 import {
   calcularEstatisticas,
   filtrarOrdenarTarefas,
+  temTarefasConcluidas,
   TodoStore,
 } from '../src/store.js';
 
@@ -147,6 +148,52 @@ test('recusa edição com título vazio, prioridade inválida ou prazo inválido
     },
     { titulo: 'Original', prioridade: 'media', prazo: '2026-12-10' },
   );
+});
+
+test('limpa tarefas concluídas e mantém tarefas pendentes', () => {
+  const armazenamento = criarArmazenamento([]);
+  const store = new TodoStore(armazenamento);
+  const pendente1 = store.adicionar('Pendente 1');
+  const concluida1 = store.adicionar('Concluída 1');
+  const pendente2 = store.adicionar('Pendente 2');
+  const concluida2 = store.adicionar('Concluída 2');
+  store.alternar(concluida1.id);
+  store.alternar(concluida2.id);
+
+  assert.equal(store.limparConcluidas(), 2);
+  assert.deepEqual(
+    store.listar().map((tarefa) => tarefa.id),
+    [pendente1.id, pendente2.id],
+  );
+  assert.deepEqual(
+    armazenamento.lerTarefas().map((tarefa) => tarefa.id),
+    [pendente1.id, pendente2.id],
+  );
+});
+
+test('limpa a lista inteira quando todas as tarefas estão concluídas', () => {
+  const store = criarStoreParaTeste();
+  const tarefa1 = store.adicionar('Concluída 1');
+  const tarefa2 = store.adicionar('Concluída 2');
+  store.alternar(tarefa1.id);
+  store.alternar(tarefa2.id);
+
+  assert.equal(store.limparConcluidas(), 2);
+  assert.deepEqual(store.listar(), []);
+});
+
+test('não altera a lista quando não há tarefas concluídas', () => {
+  const store = criarStoreParaTeste();
+  const tarefa = store.adicionar('Pendente');
+
+  assert.equal(store.limparConcluidas(), 0);
+  assert.deepEqual(store.listar(), [tarefa]);
+});
+
+test('só indica que o botão deve aparecer quando há tarefas concluídas', () => {
+  assert.equal(temTarefasConcluidas([]), false);
+  assert.equal(temTarefasConcluidas([{ concluida: false }]), false);
+  assert.equal(temTarefasConcluidas([{ concluida: true }]), true);
 });
 
 test('normaliza e persiste títulos antigos ao carregar tarefas', () => {

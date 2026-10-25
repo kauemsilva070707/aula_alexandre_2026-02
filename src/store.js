@@ -1,6 +1,10 @@
 const CHAVE = 'todolab:tarefas';
 const PRIORIDADES = ['alta', 'media', 'baixa'];
 
+export function temTarefasConcluidas(tarefas) {
+  return tarefas.some((tarefa) => tarefa.concluida);
+}
+
 export function filtrarOrdenarTarefas(
   tarefas,
   { busca = '', status = 'todas', ordenacao = 'data' } = {},
@@ -182,5 +186,15 @@ export class TodoStore {
     const indice = this.tarefas.findIndex((tarefa) => tarefa.titulo === alvo.titulo);
     this.tarefas.splice(indice, 1);
     this.salvar();
+  }
+
+  limparConcluidas() {
+    const quantidadeRemovida = this.tarefas.length
+      - this.tarefas.filter((tarefa) => !tarefa.concluida).length;
+    if (quantidadeRemovida === 0) return 0;
+
+    this.tarefas = this.tarefas.filter((tarefa) => !tarefa.concluida);
+    this.salvar();
+    return quantidadeRemovida;
   }
 }
