@@ -31,14 +31,59 @@
         <form id="todo-form" class="composer">
           <label class="sr-only" for="todo-input">Nova tarefa</label>
           <input id="todo-input" name="title" autocomplete="off" placeholder="O que precisa ser feito?" />
+          <label class="sr-only" for="todo-priority">Prioridade</label>
+          <select id="todo-priority" name="priority">
+            <option value="alta">Alta</option>
+            <option value="media" selected>Média</option>
+            <option value="baixa">Baixa</option>
+          </select>
+          <label class="sr-only" for="todo-deadline">Prazo máximo para conclusão</label>
+          <input id="todo-deadline" name="deadline" type="date" required />
           <button type="submit">Adicionar</button>
         </form>
 
-        <section aria-label="Estatísticas das tarefas" aria-live="polite">
-          <p>Total de tarefas: <span id="total-tasks">0</span></p>
-          <p>Tarefas pendentes: <span id="pending-tasks">0</span></p>
-          <p>Tarefas concluídas: <span id="completed-tasks">0</span></p>
-          <p>Percentual de conclusão: <span id="completion-percentage">0%</span></p>
+        <section class="task-controls" aria-label="Pesquisa, filtros e ordenação">
+          <div class="task-controls__search">
+            <label class="control-label" for="todo-search">Buscar tarefas</label>
+            <input id="todo-search" type="search" placeholder="Pesquisar pelo nome..." />
+          </div>
+          <div class="task-controls__filters" role="group" aria-label="Filtrar tarefas por status">
+            <span class="control-label">Status</span>
+            <div class="filter-options">
+              <button type="button" data-status-filter="todas" aria-pressed="true">Todas</button>
+              <button type="button" data-status-filter="ativas" aria-pressed="false">Ativas</button>
+              <button type="button" data-status-filter="concluidas" aria-pressed="false">Concluídas</button>
+            </div>
+          </div>
+          <div class="task-controls__sort">
+            <label class="control-label" for="todo-sort">Ordenar por</label>
+            <select id="todo-sort">
+              <option value="data">Prazo mais próximo</option>
+              <option value="prioridade">Prioridade alta</option>
+            </select>
+          </div>
+        </section>
+
+        <section class="task-stats" aria-label="Estatísticas das tarefas" aria-live="polite">
+          <h3 class="section-heading">Visão geral</h3>
+          <div class="stats-grid">
+            <article class="stat-card">
+              <span class="stat-card__label">Total de tarefas</span>
+              <strong id="total-tasks">0</strong>
+            </article>
+            <article class="stat-card stat-card--pending">
+              <span class="stat-card__label">Tarefas pendentes</span>
+              <strong id="pending-tasks">0</strong>
+            </article>
+            <article class="stat-card stat-card--completed">
+              <span class="stat-card__label">Tarefas concluídas</span>
+              <strong id="completed-tasks">0</strong>
+            </article>
+            <article class="stat-card stat-card--progress">
+              <span class="stat-card__label">Percentual de conclusão</span>
+              <strong id="completion-percentage">0%</strong>
+            </article>
+          </div>
         </section>
 
         <ul id="todo-list" class="todo-list" aria-live="polite"></ul>

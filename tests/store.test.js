@@ -1,6 +1,10 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { calcularEstatisticas, TodoStore } from '../src/store.js';
+import {
+  calcularEstatisticas,
+  filtrarOrdenarTarefas,
+  TodoStore,
+} from '../src/store.js';
 
 function verificarEstatisticas(tarefas, esperado) {
   assert.deepEqual(calcularEstatisticas(tarefas), esperado);
@@ -101,13 +105,162 @@ test('remove espaços extras no início, no fim e no meio ao editar uma tarefa',
   assert.equal(armazenamento.lerTarefas()[0].titulo, 'estudar Git');
 });
 
+test('permite editar título, prioridade e prazo e persiste os três valores', () => {
+  const armazenamento = criarArmazenamento([]);
+  const store = new TodoStore(armazenamento);
+  const tarefa = store.adicionarComPrioridadeEPrazo('Rascunho', 'baixa', '2026-12-10');
+
+  assert.equal(
+    store.editarDetalhes(tarefa.id, '  Entrega final  ', 'alta', '2026-12-01'),
+    true,
+  );
+  assert.deepEqual(
+    {
+      titulo: store.listar()[0].titulo,
+      prioridade: store.listar()[0].prioridade,
+      prazo: store.listar()[0].prazo,
+    },
+    { titulo: 'Entrega final', prioridade: 'alta', prazo: '2026-12-01' },
+  );
+  assert.deepEqual(
+    {
+      titulo: armazenamento.lerTarefas()[0].titulo,
+      prioridade: armazenamento.lerTarefas()[0].prioridade,
+      prazo: armazenamento.lerTarefas()[0].prazo,
+    },
+    { titulo: 'Entrega final', prioridade: 'alta', prazo: '2026-12-01' },
+  );
+});
+
+test('recusa edição com título vazio, prioridade inválida ou prazo inválido', () => {
+  const store = criarStoreParaTeste();
+  const tarefa = store.adicionarComPrioridadeEPrazo('Original', 'media', '2026-12-10');
+
+  assert.equal(store.editarDetalhes(tarefa.id, ' ', 'alta', '2026-12-01'), false);
+  assert.equal(store.editarDetalhes(tarefa.id, 'Alterada', 'urgente', '2026-12-01'), false);
+  assert.equal(store.editarDetalhes(tarefa.id, 'Alterada', 'alta', '2026-02-30'), false);
+  assert.deepEqual(
+    {
+      titulo: store.listar()[0].titulo,
+      prioridade: store.listar()[0].prioridade,
+      prazo: store.listar()[0].prazo,
+    },
+    { titulo: 'Original', prioridade: 'media', prazo: '2026-12-10' },
+  );
+});
+
 test('normaliza e persiste títulos antigos ao carregar tarefas', () => {
   const armazenamento = criarArmazenamento([
-    { id: '1', titulo: '  tarefa antiga  ', concluida: false },
+    {
+      id: '1',
+      titulo: '  tarefa antiga  ',
+      concluida: false,
+      criadaEm: '2026-01-01T00:00:00.000Z',
+    },
   ]);
 
   const store = new TodoStore(armazenamento);
 
   assert.equal(store.listar()[0].titulo, 'tarefa antiga');
+  assert.equal(store.listar()[0].prazo, null);
+  assert.equal('criadaEm' in store.listar()[0], false);
   assert.equal(armazenamento.lerTarefas()[0].titulo, 'tarefa antiga');
+  assert.equal('criadaEm' in armazenamento.lerTarefas()[0], false);
+});
+
+test('cadastra prioridade selecionada e prazo definido pelo usuário', () => {
+  const armazenamento = criarArmazenamento([]);
+  const store = new TodoStore(armazenamento);
+
+  const tarefa = store.adicionarComPrioridadeEPrazo('Entrega', 'alta', '2026-11-20');
+
+  assert.equal(tarefa.titulo, 'Entrega');
+  assert.equal(tarefa.prioridade, 'alta');
+  assert.equal(tarefa.prazo, '2026-11-20');
+  assert.equal('criadaEm' in tarefa, false);
+  assert.equal(armazenamento.lerTarefas()[0].prioridade, 'alta');
+  assert.equal(armazenamento.lerTarefas()[0].prazo, '2026-11-20');
+});
+
+test('exige prazo válido para cadastrar tarefa com prioridade e prazo', () => {
+  const store = criarStoreParaTeste();
+
+  assert.equal(store.adicionarComPrioridadeEPrazo('Sem prazo', 'alta', ''), null);
+  assert.equal(store.adicionarComPrioridadeEPrazo('Data impossível', 'alta', '2026-02-30'), null);
+  assert.deepEqual(store.listar(), []);
+});
+
+test('usa prioridade média para valores de prioridade inválidos ou ausentes', () => {
+  const store = criarStoreParaTeste();
+
+  assert.equal(store.adicionar('Sem prioridade').prioridade, 'media');
+  assert.equal(store.adicionarComPrioridade('Prioridade inválida', 'urgente').prioridade, 'media');
+});
+
+test('busca tarefas pelo título sem diferenciar maiúsculas e minúsculas', () => {
+  const tarefas = [
+    { titulo: 'Limpar mesa', concluida: false, prioridade: 'media', prazo: '2026-01-01' },
+    { titulo: 'Estudar Git', concluida: false, prioridade: 'alta', prazo: '2026-01-02' },
+  ];
+
+  assert.deepEqual(
+    filtrarOrdenarTarefas(tarefas, { busca: 'LIMPAR' }).map((tarefa) => tarefa.titulo),
+    ['Limpar mesa'],
+  );
+});
+
+test('filtra tarefas ativas, concluídas e todas', () => {
+  const tarefas = [
+    { titulo: 'Ativa', concluida: false, prioridade: 'media', prazo: '2026-01-01' },
+    { titulo: 'Concluída', concluida: true, prioridade: 'media', prazo: '2026-01-02' },
+  ];
+
+  assert.deepEqual(
+    filtrarOrdenarTarefas(tarefas, { status: 'ativas' }).map((tarefa) => tarefa.titulo),
+    ['Ativa'],
+  );
+  assert.deepEqual(
+    filtrarOrdenarTarefas(tarefas, { status: 'concluidas' }).map((tarefa) => tarefa.titulo),
+    ['Concluída'],
+  );
+  assert.equal(filtrarOrdenarTarefas(tarefas, { status: 'todas' }).length, 2);
+});
+
+test('ordena tarefas por prioridade e por prazo mais próximo', () => {
+  const tarefas = [
+    { titulo: 'Baixa distante', concluida: false, prioridade: 'baixa', prazo: '2026-01-03' },
+    { titulo: 'Alta próxima', concluida: false, prioridade: 'alta', prazo: '2026-01-01' },
+    { titulo: 'Média', concluida: false, prioridade: 'media', prazo: '2026-01-02' },
+  ];
+
+  assert.deepEqual(
+    filtrarOrdenarTarefas(tarefas, { ordenacao: 'prioridade' }).map((tarefa) => tarefa.titulo),
+    ['Alta próxima', 'Média', 'Baixa distante'],
+  );
+  assert.deepEqual(
+    filtrarOrdenarTarefas(tarefas, { ordenacao: 'data' }).map((tarefa) => tarefa.titulo),
+    ['Alta próxima', 'Média', 'Baixa distante'],
+  );
+});
+
+test('ordena tarefas sem prazo no final', () => {
+  const tarefas = [
+    { titulo: 'Sem prazo', concluida: false, prioridade: 'media', prazo: null },
+    { titulo: 'Com prazo', concluida: false, prioridade: 'media', prazo: '2026-01-01' },
+  ];
+
+  assert.deepEqual(
+    filtrarOrdenarTarefas(tarefas, { ordenacao: 'data' }).map((tarefa) => tarefa.titulo),
+    ['Com prazo', 'Sem prazo'],
+  );
+});
+
+test('retorna lista vazia com segurança quando busca ou filtro não encontra tarefas', () => {
+  const tarefas = [
+    { titulo: 'Ativa', concluida: false, prioridade: 'media', prazo: '2026-01-01' },
+  ];
+
+  assert.deepEqual(filtrarOrdenarTarefas(tarefas, { busca: 'inexistente' }), []);
+  assert.deepEqual(filtrarOrdenarTarefas(tarefas, { status: 'concluidas' }), []);
+  assert.deepEqual(filtrarOrdenarTarefas([], {}), []);
 });
