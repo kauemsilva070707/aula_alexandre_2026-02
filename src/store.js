@@ -156,6 +156,16 @@ export class TodoStore {
     this.salvar();
   }
 
+  alternarTodas() {
+    if (this.tarefas.length === 0) return;
+    const concluirTodas = !this.tarefas.every((tarefa) => tarefa.concluida);
+    this.tarefas = this.tarefas.map((tarefa) => ({
+      ...tarefa,
+      concluida: concluirTodas,
+    }));
+    this.salvar();
+  }
+
   editar(id, titulo) {
     const tituloLimpo = limparTitulo(titulo);
     if (!tituloLimpo) return;
