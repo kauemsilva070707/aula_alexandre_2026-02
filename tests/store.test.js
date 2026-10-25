@@ -232,6 +232,41 @@ test('não altera nem cria tarefas ao alternar uma lista vazia', () => {
   assert.deepEqual(armazenamento.lerTarefas(), []);
 });
 
+test('remove apenas a tarefa selecionada entre tarefas com nomes duplicados', () => {
+  const armazenamento = criarArmazenamento([]);
+  const store = new TodoStore(armazenamento);
+  const primeira = store.adicionar('Mesmo nome');
+  const segunda = store.adicionar('Mesmo nome');
+  const terceira = store.adicionar('Outra tarefa');
+  store.alternar(segunda.id);
+
+  store.remover(segunda.id);
+
+  assert.deepEqual(
+    store.listar().map(({ id, concluida }) => ({ id, concluida })),
+    [
+      { id: primeira.id, concluida: false },
+      { id: terceira.id, concluida: false },
+    ],
+  );
+  assert.deepEqual(
+    armazenamento.lerTarefas().map((tarefa) => tarefa.id),
+    [primeira.id, terceira.id],
+  );
+});
+
+test('não altera nem persiste alterações para identificador inexistente', () => {
+  const armazenamento = criarArmazenamento([]);
+  const store = new TodoStore(armazenamento);
+  const tarefa = store.adicionar('Preservada');
+  const antes = armazenamento.lerTarefas();
+
+  store.remover('id-inexistente');
+
+  assert.deepEqual(store.listar(), [tarefa]);
+  assert.deepEqual(armazenamento.lerTarefas(), antes);
+});
+
 test('normaliza e persiste títulos antigos ao carregar tarefas', () => {
   const armazenamento = criarArmazenamento([
     {

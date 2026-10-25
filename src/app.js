@@ -172,6 +172,8 @@ function render() {
     remove.textContent = 'Remover';
     remove.setAttribute('aria-label', `Remover ${tarefa.titulo}`);
     remove.addEventListener('click', () => {
+      const confirmou = globalThis.confirm(`Deseja excluir a tarefa "${tarefa.titulo}"?`);
+      if (!confirmou) return;
       store.remover(tarefa.id);
       render();
     });
@@ -211,6 +213,15 @@ for (const button of filterButtons) {
 }
 
 clearCompletedButton.addEventListener('click', () => {
+  const quantidade = store.estatisticas().concluidas;
+  if (quantidade === 0) return;
+
+  const descricaoTarefas = quantidade === 1 ? 'tarefa concluída' : 'tarefas concluídas';
+  const confirmou = globalThis.confirm(
+    `Deseja excluir ${quantidade} ${descricaoTarefas}?`,
+  );
+  if (!confirmou) return;
+
   store.limparConcluidas();
   render();
 });
