@@ -30,9 +30,9 @@ Cada Issue, Pull Request, revisão e decisão de merge deste repositório é tam
 
 Um gerenciador de tarefas no estilo TodoMVC, em JavaScript puro, sem dependências externas. Ele chega até vocês **incompleto e sem teste automatizado nenhum** — porque é assim que software chega na vida real.
 
-**Funciona hoje:** adicionar, listar, concluir, remover e persistir tarefas no navegador (`localStorage`).
+**Funciona hoje:** adicionar, listar, editar, concluir, remover e persistir tarefas no navegador (`localStorage`).
 
-**Ainda não existe:** contador de tarefas restantes, filtros, edição, seleção e limpeza em massa, acessibilidade aprofundada, tratamento de erro e testes automatizados — cada um desses vira uma rodada da disciplina.
+**Ainda não existe:** contador de tarefas restantes, filtros, seleção e limpeza em massa, acessibilidade aprofundada, tratamento de erro e testes automatizados — cada um desses vira uma rodada da disciplina.
 
 ## Como a equipe começa
 

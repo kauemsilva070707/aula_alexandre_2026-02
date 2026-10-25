@@ -46,6 +46,14 @@ export class TodoStore {
     this.salvar();
   }
 
+  editar(id, titulo) {
+    if (!titulo) return;
+    const tarefa = this.tarefas.find((item) => item.id === id);
+    if (!tarefa) return;
+    tarefa.titulo = titulo;
+    this.salvar();
+  }
+
   remover(id) {
     const alvo = this.tarefas.find((tarefa) => tarefa.id === id);
     if (!alvo) return;
