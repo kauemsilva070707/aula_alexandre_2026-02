@@ -1,4 +1,4 @@
-import { filtrarOrdenarTarefas, TodoStore } from './store.js';
+import { filtrarOrdenarTarefas, temTarefasConcluidas, TodoStore } from './store.js';
 
 const store = new TodoStore();
 const form = document.querySelector('#todo-form');
@@ -14,6 +14,7 @@ const deadlineInput = document.querySelector('#todo-deadline');
 const searchInput = document.querySelector('#todo-search');
 const sortInput = document.querySelector('#todo-sort');
 const filterButtons = document.querySelectorAll('[data-status-filter]');
+const clearCompletedButton = document.querySelector('#clear-completed');
 let tarefaEmEdicao = null;
 let filtroStatus = 'todas';
 
@@ -37,6 +38,7 @@ function render() {
   pendingTasks.textContent = estatisticas.pendentes;
   completedTasks.textContent = estatisticas.concluidas;
   completionPercentage.textContent = `${estatisticas.percentualConclusao}%`;
+  clearCompletedButton.hidden = !temTarefasConcluidas(tarefas);
 
   for (const tarefa of tarefasVisiveis) {
     const item = document.createElement('li');
@@ -195,6 +197,11 @@ for (const button of filterButtons) {
     render();
   });
 }
+
+clearCompletedButton.addEventListener('click', () => {
+  store.limparConcluidas();
+  render();
+});
 
 function formatarPrazo(prazo) {
   const [ano, mes, dia] = prazo.split('-');

@@ -30,9 +30,9 @@ Cada Issue, Pull Request, revisão e decisão de merge deste repositório é tam
 
 Um gerenciador de tarefas no estilo TodoMVC, em JavaScript puro, sem dependências externas. Ele chega até vocês **incompleto e sem teste automatizado nenhum** — porque é assim que software chega na vida real.
 
-**Funciona hoje:** adicionar tarefas com prioridade e prazo máximo de conclusão, listar, editar, concluir, remover, buscar por nome, filtrar por status, ordenar por prioridade ou pelo prazo mais próximo e persistir tarefas no navegador (`localStorage`).
+**Funciona hoje:** adicionar tarefas com prioridade e prazo máximo de conclusão, listar, editar, concluir, remover tarefas concluídas em lote, buscar por nome, filtrar por status, ordenar por prioridade ou pelo prazo mais próximo e persistir tarefas no navegador (`localStorage`).
 
-**Ainda não existe:** seleção e limpeza em massa, acessibilidade aprofundada e tratamento de erro — cada um desses vira uma rodada da disciplina.
+**Ainda não existe:** seleção em massa, acessibilidade aprofundada e tratamento de erro — cada um desses vira uma rodada da disciplina.
 
 ## Como a equipe começa
 
