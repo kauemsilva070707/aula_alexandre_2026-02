@@ -196,6 +196,42 @@ test('só indica que o botão deve aparecer quando há tarefas concluídas', () 
   assert.equal(temTarefasConcluidas([{ concluida: true }]), true);
 });
 
+test('marca todas as tarefas como concluídas quando há tarefas pendentes', () => {
+  const armazenamento = criarArmazenamento([]);
+  const store = new TodoStore(armazenamento);
+  const tarefas = [
+    store.adicionar('Pendente 1'),
+    store.adicionar('Já concluída'),
+    store.adicionar('Pendente 2'),
+  ];
+  store.alternar(tarefas[1].id);
+
+  store.alternarTodas();
+
+  assert.ok(store.listar().every((tarefa) => tarefa.concluida));
+  assert.ok(armazenamento.lerTarefas().every((tarefa) => tarefa.concluida));
+});
+
+test('desmarca todas as tarefas quando todas já estão concluídas', () => {
+  const store = criarStoreParaTeste();
+  const tarefas = [store.adicionar('Tarefa 1'), store.adicionar('Tarefa 2')];
+  for (const tarefa of tarefas) store.alternar(tarefa.id);
+
+  store.alternarTodas();
+
+  assert.ok(store.listar().every((tarefa) => !tarefa.concluida));
+});
+
+test('não altera nem cria tarefas ao alternar uma lista vazia', () => {
+  const armazenamento = criarArmazenamento([]);
+  const store = new TodoStore(armazenamento);
+
+  store.alternarTodas();
+
+  assert.deepEqual(store.listar(), []);
+  assert.deepEqual(armazenamento.lerTarefas(), []);
+});
+
 test('normaliza e persiste títulos antigos ao carregar tarefas', () => {
   const armazenamento = criarArmazenamento([
     {

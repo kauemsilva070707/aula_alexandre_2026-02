@@ -15,6 +15,8 @@ const searchInput = document.querySelector('#todo-search');
 const sortInput = document.querySelector('#todo-sort');
 const filterButtons = document.querySelectorAll('[data-status-filter]');
 const clearCompletedButton = document.querySelector('#clear-completed');
+const toggleAllCheckbox = document.querySelector('#toggle-all-tasks');
+const toggleAllLabel = document.querySelector('#toggle-all-label');
 let tarefaEmEdicao = null;
 let filtroStatus = 'todas';
 
@@ -39,6 +41,16 @@ function render() {
   completedTasks.textContent = estatisticas.concluidas;
   completionPercentage.textContent = `${estatisticas.percentualConclusao}%`;
   clearCompletedButton.hidden = !temTarefasConcluidas(tarefas);
+  toggleAllCheckbox.disabled = tarefas.length === 0;
+  toggleAllCheckbox.checked = tarefas.length > 0 && estatisticas.concluidas === tarefas.length;
+  toggleAllCheckbox.indeterminate = estatisticas.concluidas > 0
+    && estatisticas.concluidas < tarefas.length;
+  const todasConcluidas = tarefas.length > 0 && estatisticas.concluidas === tarefas.length;
+  toggleAllLabel.textContent = todasConcluidas ? 'Desmarcar todas' : 'Marcar todas';
+  toggleAllCheckbox.setAttribute(
+    'aria-label',
+    todasConcluidas ? 'Desmarcar todas as tarefas' : 'Marcar todas as tarefas',
+  );
 
   for (const tarefa of tarefasVisiveis) {
     const item = document.createElement('li');
@@ -200,6 +212,11 @@ for (const button of filterButtons) {
 
 clearCompletedButton.addEventListener('click', () => {
   store.limparConcluidas();
+  render();
+});
+
+toggleAllCheckbox.addEventListener('change', () => {
+  store.alternarTodas();
   render();
 });
 
