@@ -1,11 +1,9 @@
-# ISSUE-00 — Modelo de registro de diálogo com IA
-
-Copie este arquivo para `ISSUE-NN.md`, substituindo `NN` pelo número real da Issue. Registre o que foi efetivamente enviado e recebido; não preencha com exemplos fictícios.
+# ISSUE-04 — Implementar filtros Todas, Ativas e Concluídas
 
 ## Identificação da rodada
 
-- Issue: #NN —
-- Branch (ramificação):
+- Issue: #4 — Implementar filtros Todas, Ativas e Concluídas
+- Branch (ramificação): feature/issue-04-
 - Autor da alteração:
 - Revisor previsto:
 - Data:
