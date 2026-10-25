@@ -5,12 +5,21 @@ const form = document.querySelector('#todo-form');
 const input = document.querySelector('#todo-input');
 const list = document.querySelector('#todo-list');
 const emptyState = document.querySelector('#empty-state');
+const totalTasks = document.querySelector('#total-tasks');
+const pendingTasks = document.querySelector('#pending-tasks');
+const completedTasks = document.querySelector('#completed-tasks');
+const completionPercentage = document.querySelector('#completion-percentage');
 let tarefaEmEdicao = null;
 
 function render() {
   const tarefas = store.listar();
+  const estatisticas = store.estatisticas();
   list.replaceChildren();
   emptyState.hidden = tarefas.length > 0;
+  totalTasks.textContent = estatisticas.total;
+  pendingTasks.textContent = estatisticas.pendentes;
+  completedTasks.textContent = estatisticas.concluidas;
+  completionPercentage.textContent = `${estatisticas.percentualConclusao}%`;
 
   for (const tarefa of tarefas) {
     const item = document.createElement('li');

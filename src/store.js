@@ -1,5 +1,17 @@
 const CHAVE = 'todolab:tarefas';
 
+export function calcularEstatisticas(tarefas) {
+  const total = tarefas.length;
+  const concluidas = tarefas.filter((tarefa) => tarefa.concluida).length;
+
+  return {
+    total,
+    pendentes: total - concluidas,
+    concluidas,
+    percentualConclusao: total === 0 ? 0 : Math.round((concluidas / total) * 100),
+  };
+}
+
 function criarTarefa(titulo) {
   return {
     id: globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random()}`,
@@ -29,6 +41,10 @@ export class TodoStore {
 
   listar() {
     return [...this.tarefas];
+  }
+
+  estatisticas() {
+    return calcularEstatisticas(this.tarefas);
   }
 
   adicionar(titulo) {
