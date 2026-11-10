@@ -1,4 +1,5 @@
 import { filtrarOrdenarTarefas, temTarefasConcluidas, TodoStore } from './store.js';
+import { mostrarToastAdicao, mostrarToastConclusao, mostrarToastExclusao } from './toast.js';
 
 const store = new TodoStore();
 const form = document.querySelector('#todo-form');
@@ -63,6 +64,7 @@ function render() {
     checkbox.setAttribute('aria-label', `Marcar ${tarefa.titulo} como concluída`);
     checkbox.addEventListener('change', () => {
       store.alternar(tarefa.id);
+      mostrarToastConclusao();
       render();
     });
 
@@ -175,6 +177,7 @@ function render() {
       const confirmou = globalThis.confirm(`Deseja excluir a tarefa "${tarefa.titulo}"?`);
       if (!confirmou) return;
       store.remover(tarefa.id);
+      mostrarToastExclusao();
       render();
     });
 
@@ -199,6 +202,7 @@ form.addEventListener('submit', (event) => {
   input.value = '';
   deadlineInput.value = '';
   input.focus();
+  mostrarToastAdicao();
   render();
 });
 
@@ -223,11 +227,13 @@ clearCompletedButton.addEventListener('click', () => {
   if (!confirmou) return;
 
   store.limparConcluidas();
+  mostrarToastExclusao();
   render();
 });
 
 toggleAllCheckbox.addEventListener('change', () => {
   store.alternarTodas();
+  mostrarToastConclusao();
   render();
 });
 

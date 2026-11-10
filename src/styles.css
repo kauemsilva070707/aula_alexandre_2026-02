@@ -213,3 +213,33 @@ input, button { font: inherit; }
   .todo-edit-fields .todo-editor:first-child { grid-column: auto; }
   .build-mark { display: none; }
 }
+
+#toast-container {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  display: grid;
+  gap: 12px;
+  z-index: 40;
+  pointer-events: none;
+}
+
+.toast {
+  min-width: 220px;
+  max-width: min(360px, calc(100vw - 32px));
+  padding: 12px 16px;
+  border: 1px solid rgb(199 255 67 / 30%);
+  background: rgb(16 19 16 / 92%);
+  color: var(--ink);
+  box-shadow: 0 12px 30px rgb(0 0 0 / 30%);
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity .2s ease, transform .2s ease;
+  font-size: .8rem;
+  letter-spacing: .04em;
+}
+
+.toast--hidden {
+  opacity: 0;
+  transform: translateY(8px);
+}
