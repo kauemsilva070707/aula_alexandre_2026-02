@@ -38,7 +38,7 @@ function render() {
     if (tarefaEmEdicao === tarefa.id) {
       const editor = document.createElement('input');
       editor.type = 'text';
-      editor.value = tarefa.titulo;
+      editor.value = tarefa.titulo.trim();
       editor.required = true;
       editor.className = 'todo-editor';
       editor.setAttribute('aria-label', `Editar tarefa ${tarefa.titulo}`);
@@ -51,8 +51,9 @@ function render() {
       save.className = 'edit';
       save.textContent = 'Salvar';
       save.addEventListener('click', () => {
-        if (!editor.reportValidity()) return;
-        store.editar(tarefa.id, editor.value);
+        const tituloLimpo = editor.value.trim();
+        if (!tituloLimpo) return;
+        store.editar(tarefa.id, tituloLimpo);
         tarefaEmEdicao = null;
         render();
       });
@@ -113,7 +114,10 @@ function render() {
 form.addEventListener('submit', (event) => {
   event.preventDefault();
   const tarefa = store.adicionar(input.value);
-  if (!tarefa) return;
+  if (!tarefa) {
+    input.focus();
+    return;
+  }
   input.value = '';
   input.focus();
   render();

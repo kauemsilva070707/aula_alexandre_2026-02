@@ -1,11 +1,11 @@
-# ISSUE-00 — Modelo de registro de diálogo com IA
+# ISSUE-13 — Janela de confirmação de exclusão
 
 Copie este arquivo para `ISSUE-NN.md`, substituindo `NN` pelo número real da Issue. Registre o que foi efetivamente enviado e recebido; não preencha com exemplos fictícios.
 
 ## Identificação da rodada
 
-- Issue: #NN —
-- Branch (ramificação):
+- Issue: #13 — Janela de confirmação de exclusão
+- Branch (ramificação): feature/issue-13-
 - Autor da alteração:
 - Revisor previsto:
 - Data:
