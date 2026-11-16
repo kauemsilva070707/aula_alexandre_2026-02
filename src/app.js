@@ -243,3 +243,73 @@ function formatarPrazo(prazo) {
 }
 
 render();
+
+document.getElementById('btn-export').addEventListener('click', () => {
+  const tarefas = store.listar();
+  if (tarefas.length === 0) {
+    exibirErro('Não há tarefas cadastradas para exportar.');
+    return;
+  }
+
+  const blob = new Blob([store.exportar()], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const downloadAnchor = document.createElement('a');
+  downloadAnchor.href = url;
+  downloadAnchor.download = `todolist-backup-${new Date().toISOString().slice(0, 10)}.json`;
+  document.body.appendChild(downloadAnchor);
+  downloadAnchor.click();
+  document.body.removeChild(downloadAnchor);
+  URL.revokeObjectURL(url);
+});
+
+const btnImportTrigger = document.getElementById('btn-import-trigger');
+const inputImport = document.getElementById('input-import');
+const feedbackMessage = document.getElementById('feedback-message');
+
+btnImportTrigger.addEventListener('click', () => {
+  inputImport.click();
+});
+
+inputImport.addEventListener('change', async (event) => {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const formatoJson = file.type === 'application/json'
+    || file.type.endsWith('+json')
+    || /\.json$/i.test(file.name);
+  if (!formatoJson) {
+    exibirErro('Formato de arquivo inválido. Selecione um arquivo JSON.');
+    inputImport.value = '';
+    return;
+  }
+
+  try {
+    store.importar(await file.text());
+  } catch (error) {
+    exibirErro(`Erro ao importar: ${error.message}`);
+    return;
+  } finally {
+    inputImport.value = '';
+  }
+
+  render();
+  exibirSucesso('Tarefas importadas com sucesso!');
+});
+
+function exibirErro(mensagem) {
+  if (feedbackMessage) {
+    feedbackMessage.style.color = 'red';
+    feedbackMessage.textContent = mensagem;
+  } else {
+    alert(mensagem);
+  }
+}
+
+function exibirSucesso(mensagem) {
+  if (feedbackMessage) {
+    feedbackMessage.style.color = 'green';
+    feedbackMessage.textContent = mensagem;
+  } else {
+    alert(mensagem);
+  }
+}

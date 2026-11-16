@@ -243,3 +243,54 @@ input, button { font: inherit; }
   opacity: 0;
   transform: translateY(8px);
 }
+
+/* --- Estilos para Exportação e Importação de Tarefas (Centralizado) --- */
+
+.data-actions {
+  display: flex;
+  justify-content: center; /* Centraliza os botões horizontalmente */
+  align-items: center;
+  gap: 12px;
+  margin: 20px 0;
+  flex-wrap: wrap;
+}
+
+.data-actions button {
+  background-color: #2563eb;
+  color: #ffffff;
+  border: none;
+  padding: 10px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.data-actions button:hover {
+  background-color: #1d4ed8;
+}
+
+.data-actions button:active {
+  transform: scale(0.98);
+}
+
+/* Variação para o botão de importar */
+#btn-import-trigger {
+  background-color: #4f46e5;
+}
+
+#btn-import-trigger:hover {
+  background-color: #4338ca;
+}
+
+/* Mensagens de feedback centralizadas */
+#feedback-message {
+  margin-top: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  min-height: 20px;
+  text-align: center; /* Centraliza o texto de erro/sucesso */
+  transition: opacity 0.3s ease;
+}
