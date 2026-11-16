@@ -122,6 +122,64 @@ export class TodoStore {
     return [...this.tarefas];
   }
 
+  exportar() {
+    return JSON.stringify(this.tarefas, null, 2);
+  }
+
+  importar(conteudo) {
+    if (typeof conteudo !== 'string') {
+      throw new Error('O conteúdo do arquivo deve ser texto JSON.');
+    }
+
+    let tarefasImportadas;
+    try {
+      tarefasImportadas = JSON.parse(conteudo);
+    } catch {
+      throw new Error('O arquivo está corrompido ou não contém um JSON válido.');
+    }
+
+    if (!Array.isArray(tarefasImportadas)) {
+      throw new Error('O arquivo JSON deve conter uma lista de tarefas.');
+    }
+
+    const ids = new Set();
+    const tarefasValidadas = tarefasImportadas.map((tarefa, indice) => {
+      if (!tarefa || typeof tarefa !== 'object' || Array.isArray(tarefa)) {
+        throw new Error(`A tarefa na posição ${indice + 1} é inválida.`);
+      }
+
+      if (typeof tarefa.id !== 'string' || !tarefa.id.trim()) {
+        throw new Error(`A tarefa na posição ${indice + 1} não possui um identificador válido.`);
+      }
+      if (ids.has(tarefa.id)) {
+        throw new Error(`O identificador da tarefa na posição ${indice + 1} está duplicado.`);
+      }
+      if (typeof tarefa.titulo !== 'string' || !limparTitulo(tarefa.titulo)) {
+        throw new Error(`A tarefa na posição ${indice + 1} não possui um título válido.`);
+      }
+      if (typeof tarefa.concluida !== 'boolean') {
+        throw new Error(`O status da tarefa na posição ${indice + 1} é inválido.`);
+      }
+      if (tarefa.prioridade !== undefined && !PRIORIDADES.includes(tarefa.prioridade)) {
+        throw new Error(`A prioridade da tarefa na posição ${indice + 1} é inválida.`);
+      }
+      if (
+        tarefa.prazo !== undefined
+        && tarefa.prazo !== null
+        && limparPrazo(tarefa.prazo) !== tarefa.prazo
+      ) {
+        throw new Error(`O prazo da tarefa na posição ${indice + 1} é inválido.`);
+      }
+
+      ids.add(tarefa.id);
+      return normalizarTarefa(tarefa);
+    });
+
+    this.tarefas = tarefasValidadas;
+    this.salvar();
+    return this.listar();
+  }
+
   estatisticas() {
     return calcularEstatisticas(this.tarefas);
   }
