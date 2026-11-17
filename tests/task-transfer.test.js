@@ -48,8 +48,8 @@ export function executarTesteUnitarioImportacaoExportacao() {
 
   store.importar(JSON.stringify(tarefasImportadas));
   assert.deepEqual(store.listar(), [
-    { ...tarefasImportadas[0], titulo: 'Preparar entrega' },
-    tarefasImportadas[1],
+    { ...tarefasImportadas[0], titulo: 'Preparar entrega', tempoEstimado: null, tempoGasto: 0 },
+    { ...tarefasImportadas[1], tempoEstimado: null, tempoGasto: 0 },
   ]);
   assert.deepEqual(armazenamento.lerTarefas(), store.listar());
   assert.deepEqual(JSON.parse(store.exportar()), store.listar());

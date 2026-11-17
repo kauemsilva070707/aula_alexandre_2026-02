@@ -1,4 +1,9 @@
-import { filtrarOrdenarTarefas, temTarefasConcluidas, TodoStore } from './store.js';
+import {
+  filtrarOrdenarTarefas,
+  temDesvioDeEstimativa,
+  temTarefasConcluidas,
+  TodoStore,
+} from './store.js';
 import { mostrarToastAdicao, mostrarToastConclusao, mostrarToastExclusao } from './toast.js';
 
 const store = new TodoStore();
@@ -12,6 +17,7 @@ const completedTasks = document.querySelector('#completed-tasks');
 const completionPercentage = document.querySelector('#completion-percentage');
 const priorityInput = document.querySelector('#todo-priority');
 const deadlineInput = document.querySelector('#todo-deadline');
+const estimatedTimeInput = document.querySelector('#todo-estimated-time');
 const searchInput = document.querySelector('#todo-search');
 const sortInput = document.querySelector('#todo-sort');
 const filterButtons = document.querySelectorAll('[data-status-filter]');
@@ -99,9 +105,18 @@ function render() {
       prazoEditor.className = 'todo-editor';
       prazoEditor.setAttribute('aria-label', `Prazo de ${tarefa.titulo}`);
 
+      const tempoGastoEditor = document.createElement('input');
+      tempoGastoEditor.type = 'number';
+      tempoGastoEditor.min = '0';
+      tempoGastoEditor.step = 'any';
+      tempoGastoEditor.required = true;
+      tempoGastoEditor.value = String(tarefa.tempoGasto);
+      tempoGastoEditor.className = 'todo-editor';
+      tempoGastoEditor.setAttribute('aria-label', `Tempo gasto em ${tarefa.titulo}, em horas`);
+
       const camposEdicao = document.createElement('div');
       camposEdicao.className = 'todo-edit-fields';
-      camposEdicao.append(editor, prioridadeEditor, prazoEditor);
+      camposEdicao.append(editor, prioridadeEditor, prazoEditor, tempoGastoEditor);
 
       const actions = document.createElement('div');
       actions.className = 'todo-actions';
@@ -111,11 +126,13 @@ function render() {
       save.className = 'edit';
       save.textContent = 'Salvar';
       save.addEventListener('click', () => {
-        const salvo = store.editarDetalhes(
+        if (!tempoGastoEditor.reportValidity()) return;
+        const salvo = store.editarDetalhesComTempoGasto(
           tarefa.id,
           editor.value,
           prioridadeEditor.value,
           prazoEditor.value,
+          tempoGastoEditor.valueAsNumber,
         );
         if (!salvo) return;
         tarefaEmEdicao = null;
@@ -131,7 +148,7 @@ function render() {
         render();
       });
 
-      for (const campo of [editor, prioridadeEditor, prazoEditor]) {
+      for (const campo of [editor, prioridadeEditor, prazoEditor, tempoGastoEditor]) {
         campo.addEventListener('keydown', (event) => {
           if (event.key === 'Enter') save.click();
           if (event.key === 'Escape') cancel.click();
@@ -154,6 +171,17 @@ function render() {
       : ' · Prazo não definido';
     priority.textContent = ` · Prioridade: ${priorityLabels[tarefa.prioridade]}${prazoLabel}`;
     title.append(priority);
+    const esforco = document.createElement('small');
+    esforco.className = `todo-time${temDesvioDeEstimativa(tarefa) ? ' todo-time--alert' : ''}`;
+    esforco.textContent = ` · Estimado: ${formatarTempo(tarefa.tempoEstimado)}`
+      + ` · Gasto: ${formatarTempo(tarefa.tempoGasto)}`;
+    esforco.setAttribute(
+      'aria-label',
+      temDesvioDeEstimativa(tarefa)
+        ? 'Tempo gasto acima da estimativa'
+        : 'Tempo gasto dentro da estimativa',
+    );
+    title.append(esforco);
 
     const actions = document.createElement('div');
     actions.className = 'todo-actions';
@@ -189,18 +217,21 @@ function render() {
 
 form.addEventListener('submit', (event) => {
   event.preventDefault();
-  const tarefa = store.adicionarComPrioridadeEPrazo(
+  const tarefa = store.adicionarComEstimativa(
     input.value,
     priorityInput.value,
     deadlineInput.value,
+    estimatedTimeInput.value === '' ? null : estimatedTimeInput.valueAsNumber,
   );
   if (!tarefa) {
     if (!input.value.trim()) input.focus();
-    else deadlineInput.focus();
+    else if (!deadlineInput.value) deadlineInput.focus();
+    else estimatedTimeInput.focus();
     return;
   }
   input.value = '';
   deadlineInput.value = '';
+  estimatedTimeInput.value = '';
   input.focus();
   mostrarToastAdicao();
   render();
@@ -240,6 +271,10 @@ toggleAllCheckbox.addEventListener('change', () => {
 function formatarPrazo(prazo) {
   const [ano, mes, dia] = prazo.split('-');
   return `${dia}/${mes}/${ano}`;
+}
+
+function formatarTempo(tempo) {
+  return tempo === null ? 'não definido' : `${tempo} h`;
 }
 
 render();

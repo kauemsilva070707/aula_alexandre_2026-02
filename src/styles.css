@@ -70,7 +70,7 @@ h1 span { color: var(--acid); font-style: italic; }
 .status { display: flex; align-items: center; gap: 9px; color: var(--acid); font-size: .72rem; text-transform: uppercase; }
 .status__light { width: 9px; height: 9px; border-radius: 50%; background: var(--acid); box-shadow: 0 0 18px var(--acid); }
 
-.composer { display: grid; grid-template-columns: 1fr auto; padding: 26px; border-bottom: 1px solid var(--line); }
+.composer { display: grid; grid-template-columns: minmax(0, 1fr) auto auto auto auto; padding: 26px; border-bottom: 1px solid var(--line); }
 input, button { font: inherit; }
 .composer input { min-width: 0; padding: 17px 18px; color: var(--ink); background: #0f110f; border: 1px solid var(--line); border-right: 0; outline: none; }
 .composer input:focus { border-color: var(--acid); box-shadow: inset 4px 0 0 var(--acid); }
@@ -175,6 +175,8 @@ input, button { font: inherit; }
 .todo { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 16px; min-height: 64px; border-bottom: 1px solid var(--line); animation: arrive .25s ease-out both; }
 .todo input, #toggle-all-tasks { width: 19px; height: 19px; accent-color: var(--acid); }
 .todo > span { min-width: 0; overflow-wrap: anywhere; }
+.todo-time { text-decoration: none; }
+.todo .todo-time--alert { color: var(--orange); font-weight: 700; }
 .todo--done span { color: var(--muted); text-decoration: line-through; }
 .todo .todo-editor { width: 100%; min-width: 0; padding: 10px 12px; color: var(--ink); background: #0f110f; border: 1px solid var(--acid); font: inherit; }
 .todo-edit-fields { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 8px; min-width: 0; }
@@ -198,7 +200,7 @@ input, button { font: inherit; }
 
 @media (max-width: 620px) {
   .shell { width: min(100% - 24px, 1100px); padding-top: 44px; }
-  .composer { grid-template-columns: 1fr; }
+  .composer { grid-template-columns: minmax(0, 1fr); }
   .composer input { border-right: 1px solid var(--line); }
   .composer button { min-height: 50px; }
   .task-controls { grid-template-columns: 1fr; gap: 16px; padding: 20px; }
