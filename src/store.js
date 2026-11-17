@@ -5,6 +5,12 @@ export function temTarefasConcluidas(tarefas) {
   return tarefas.some((tarefa) => tarefa.concluida);
 }
 
+export function temDesvioDeEstimativa(tarefa) {
+  return Number.isFinite(tarefa.tempoEstimado)
+    && Number.isFinite(tarefa.tempoGasto)
+    && tarefa.tempoGasto > tarefa.tempoEstimado;
+}
+
 export function filtrarOrdenarTarefas(
   tarefas,
   { busca = '', status = 'todas', ordenacao = 'data' } = {},
@@ -44,14 +50,20 @@ export function calcularEstatisticas(tarefas) {
   };
 }
 
-function criarTarefa(titulo, prioridade = 'media', prazo = null) {
+function criarTarefa(titulo, prioridade = 'media', prazo = null, tempoEstimado = null) {
   return {
     id: globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random()}`,
     titulo,
     concluida: false,
     prioridade: limparPrioridade(prioridade),
     prazo,
+    tempoEstimado,
+    tempoGasto: 0,
   };
+}
+
+function tempoValido(tempo) {
+  return typeof tempo === 'number' && Number.isFinite(tempo) && tempo >= 0;
 }
 
 function limparTitulo(titulo) {
@@ -85,6 +97,8 @@ function normalizarTarefa(tarefa) {
     titulo: limparTitulo(tarefa.titulo),
     prioridade: limparPrioridade(tarefa.prioridade),
     prazo: limparPrazo(tarefa.prazo),
+    tempoEstimado: tempoValido(tarefa.tempoEstimado) ? tarefa.tempoEstimado : null,
+    tempoGasto: tempoValido(tarefa.tempoGasto) ? tarefa.tempoGasto : 0,
   };
 }
 
@@ -98,6 +112,8 @@ export class TodoStore {
       tarefa.titulo !== this.tarefas[indice].titulo
       || tarefa.prioridade !== this.tarefas[indice].prioridade
       || tarefa.prazo !== this.tarefas[indice].prazo
+      || tarefa.tempoEstimado !== this.tarefas[indice].tempoEstimado
+      || tarefa.tempoGasto !== this.tarefas[indice].tempoGasto
       || Object.hasOwn(this.tarefas[indice], 'criadaEm')
     ))) {
       this.tarefas = tarefasNormalizadas;
@@ -170,6 +186,16 @@ export class TodoStore {
       ) {
         throw new Error(`O prazo da tarefa na posição ${indice + 1} é inválido.`);
       }
+      if (
+        tarefa.tempoEstimado !== undefined
+        && tarefa.tempoEstimado !== null
+        && !tempoValido(tarefa.tempoEstimado)
+      ) {
+        throw new Error(`O tempo estimado da tarefa na posição ${indice + 1} é inválido.`);
+      }
+      if (tarefa.tempoGasto !== undefined && !tempoValido(tarefa.tempoGasto)) {
+        throw new Error(`O tempo gasto da tarefa na posição ${indice + 1} é inválido.`);
+      }
 
       ids.add(tarefa.id);
       return normalizarTarefa(tarefa);
@@ -202,6 +228,23 @@ export class TodoStore {
     const prazoLimpo = limparPrazo(prazo);
     if (!tituloLimpo || !prazoLimpo) return null;
     const tarefa = criarTarefa(tituloLimpo, prioridade, prazoLimpo);
+    this.tarefas.push(tarefa);
+    this.salvar();
+    return tarefa;
+  }
+
+  adicionarComEstimativa(titulo, prioridade, prazo, tempoEstimado = null) {
+    const tituloLimpo = limparTitulo(titulo);
+    const prazoLimpo = limparPrazo(prazo);
+    if (
+      !tituloLimpo
+      || !prazoLimpo
+      || (tempoEstimado !== null && !tempoValido(tempoEstimado))
+    ) {
+      return null;
+    }
+
+    const tarefa = criarTarefa(tituloLimpo, prioridade, prazoLimpo, tempoEstimado);
     this.tarefas.push(tarefa);
     this.salvar();
     return tarefa;
@@ -244,6 +287,29 @@ export class TodoStore {
     tarefa.titulo = tituloLimpo;
     tarefa.prioridade = prioridade;
     tarefa.prazo = prazoLimpo;
+    this.salvar();
+    return true;
+  }
+
+  editarDetalhesComTempoGasto(id, titulo, prioridade, prazo, tempoGasto) {
+    const tituloLimpo = limparTitulo(titulo);
+    const prazoLimpo = limparPrazo(prazo);
+    if (
+      !tituloLimpo
+      || !PRIORIDADES.includes(prioridade)
+      || !prazoLimpo
+      || !tempoValido(tempoGasto)
+    ) {
+      return false;
+    }
+
+    const tarefa = this.tarefas.find((item) => item.id === id);
+    if (!tarefa) return false;
+
+    tarefa.titulo = tituloLimpo;
+    tarefa.prioridade = prioridade;
+    tarefa.prazo = prazoLimpo;
+    tarefa.tempoGasto = tempoGasto;
     this.salvar();
     return true;
   }
